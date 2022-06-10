@@ -15,7 +15,7 @@
 		46EDC71127C6B8D200B870D7 /* BasicExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EDC71027C6B8D200B870D7 /* BasicExampleUITests.swift */; };
 		46EDC71327C6B8D200B870D7 /* BasicExampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EDC71227C6B8D200B870D7 /* BasicExampleUITestsLaunchTests.swift */; };
 		46EDC72127C6B92C00B870D7 /* Segment in Frameworks */ = {isa = PBXBuildFile; productRef = 46EDC72027C6B92C00B870D7 /* Segment */; };
-		7BD9769F2852786D00486D66 /* BrazeKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BD9769E2852786D00486D66 /* BrazeKit */; };
+		7B3C818E2853F14300199D3E /* SegmentBraze in Frameworks */ = {isa = PBXBuildFile; productRef = 7B3C818D2853F14300199D3E /* SegmentBraze */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,8 +54,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BD9769F2852786D00486D66 /* BrazeKit in Frameworks */,
 				46EDC72127C6B92C00B870D7 /* Segment in Frameworks */,
+				7B3C818E2853F14300199D3E /* SegmentBraze in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +84,7 @@
 				46EDC70527C6B8D200B870D7 /* BasicExampleTests */,
 				46EDC70F27C6B8D200B870D7 /* BasicExampleUITests */,
 				46EDC6F327C6B8D100B870D7 /* Products */,
+				7B3C818C2853F14300199D3E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -133,6 +134,13 @@
 			path = BasicExampleUITests;
 			sourceTree = "<group>";
 		};
+		7B3C818C2853F14300199D3E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7BD976A02852789500486D66 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,7 +167,7 @@
 			name = BasicExample;
 			packageProductDependencies = (
 				46EDC72027C6B92C00B870D7 /* Segment */,
-				7BD9769E2852786D00486D66 /* BrazeKit */,
+				7B3C818D2853F14300199D3E /* SegmentBraze */,
 			);
 			productName = BasicExample;
 			productReference = 46EDC6F227C6B8D100B870D7 /* BasicExample.app */;
@@ -235,7 +243,6 @@
 			mainGroup = 46EDC6E927C6B8D100B870D7;
 			packageReferences = (
 				46EDC71F27C6B92C00B870D7 /* XCRemoteSwiftPackageReference "analytics-swift" */,
-				7BD9769D2852786D00486D66 /* XCRemoteSwiftPackageReference "braze-swift-sdk" */,
 			);
 			productRefGroup = 46EDC6F327C6B8D100B870D7 /* Products */;
 			projectDirPath = "";
@@ -611,14 +618,6 @@
 				kind = branch;
 			};
 		};
-		7BD9769D2852786D00486D66 /* XCRemoteSwiftPackageReference "braze-swift-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/braze-inc/braze-swift-sdk.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -627,10 +626,9 @@
 			package = 46EDC71F27C6B92C00B870D7 /* XCRemoteSwiftPackageReference "analytics-swift" */;
 			productName = Segment;
 		};
-		7BD9769E2852786D00486D66 /* BrazeKit */ = {
+		7B3C818D2853F14300199D3E /* SegmentBraze */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7BD9769D2852786D00486D66 /* XCRemoteSwiftPackageReference "braze-swift-sdk" */;
-			productName = BrazeKit;
+			productName = SegmentBraze;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

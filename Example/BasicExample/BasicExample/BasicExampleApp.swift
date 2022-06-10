@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Segment
+import SegmentBraze
 
 @main
 struct BasicExampleApp: App {
@@ -22,7 +23,7 @@ extension Analytics {
         let analytics = Analytics(configuration: Configuration(writeKey: "<YOUR WRITE KEY>")
                     .flushAt(3)
                     .trackApplicationLifecycleEvents(true))
-        analytics.add(plugin: ())
+        analytics.add(plugin: BrazeDestination())
         return analytics
     }
 }
