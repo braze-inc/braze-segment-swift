@@ -42,16 +42,18 @@ import UIKit
  An implementation of the Braze Analytics device mode destination as a plugin.
  */
 
-class BrazeDestination: DestinationPlugin {
-    let timeline = Timeline()
-    let type = PluginType.destination
-    let key = "Appboy"
-    var analytics: Analytics? = nil
+public class BrazeDestination: DestinationPlugin {
+    public let timeline = Timeline()
+    public let type = PluginType.destination
+    public let key = "Appboy"
+    public var analytics: Analytics? = nil
     var braze: Braze? = nil
     
     private var brazeSettings: BrazeSettings?
         
-    func update(settings: Settings, type: UpdateType) {
+    public init() { }
+    
+    public func update(settings: Settings, type: UpdateType) {
         // Skip if you have a singleton and don't want to keep updating via settings.
         guard type == .initial else { return }
         
@@ -67,7 +69,7 @@ class BrazeDestination: DestinationPlugin {
         braze = Braze(configuration: configuration)
     }
     
-    func identify(event: IdentifyEvent) -> IdentifyEvent? {
+    public func identify(event: IdentifyEvent) -> IdentifyEvent? {
         
         if let userId = event.userId, !userId.isEmpty {
             braze?.changeUser(userId: userId)
@@ -153,7 +155,7 @@ class BrazeDestination: DestinationPlugin {
         return event
     }
     
-    func track(event: TrackEvent) -> TrackEvent? {
+    public func track(event: TrackEvent) -> TrackEvent? {
         let properties = event.properties?.dictionaryValue
         let revenue = self.extractRevenue(key: "revenue", from: properties)
         if (revenue != nil && revenue != 0) || event.event == "Order Completed" || event.event == "Completed Order" {
