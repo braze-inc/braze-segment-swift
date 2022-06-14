@@ -5,10 +5,7 @@
 //  Created by Michael Grosse Huelsewiesche on 5/17/22.
 //
 
-// NOTE: You can see this plugin in use in the DestinationsBraze application.
-//
-// This plugin is NOT SUPPORTED by Segment.  It is here merely as an example,
-// and for your convenience should you find it useful.
+// NOTE: You can see this plugin in use in the BasicExample application.
 //
 
 // MIT License
@@ -221,7 +218,7 @@ private struct BrazeSettings: Codable {
     let openInAppMessagesInNewTab: Bool?
     let trackAllPages: Bool?
     let trackNamedPages: Bool?
-    var apiKey: String
+    let apiKey: String
     let customEndpoint: String?
     let logPurchaseWhenRevenuePresent: Bool?
     let automaticallyDisplayMessages: Bool?
