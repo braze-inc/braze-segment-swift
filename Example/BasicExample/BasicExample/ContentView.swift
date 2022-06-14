@@ -13,7 +13,15 @@ struct ContentView: View {
         VStack {
             HStack {
                 Button(action: {
-                    Analytics.main.track(name: "Track")
+                    var traits = [String:Any]()
+                    var products = [Any]()
+                    products.append(["price":1,"quantity":1,"productId":"foo","color":"blue", "dupe":"override"])
+                    products.append(["price":2,"quantity":2,"productId":"bar","size":"large"])
+                    products.append(["price":3,"quantity":3,"productId":"baz","fit":9])
+                    traits["products"] = products
+                    traits["dupe"] = "default"
+                    traits["general"] = "value"
+                    Analytics.main.track(name: "Order Completed", properties: traits)
                 }, label: {
                     Text("Track")
                 }).padding(6)
@@ -31,7 +39,16 @@ struct ContentView: View {
                     Text("Group")
                 }).padding(6)
                 Button(action: {
-                    Analytics.main.identify(userId: "X-1234567890")
+                    var traits = [String:Any]()
+                    traits["birthday"] = "1980-06-07T01:21:13Z"
+                    traits["email"] = "testuser@test.com"
+                    traits["firstName"] = "fnu"
+                    traits["lastName"] = "lnu"
+                    traits["gender"] = "male"
+                    traits["phone"] = "1-234-5678"
+                    traits["address"] = ["city": "Paris", "country": "USA"]
+                    traits["foo"] = ["bar": "baz"]
+                    Analytics.main.identify(userId: "X-1234567890", traits: traits)
                 }, label: {
                     Text("Identify")
                 }).padding(6)
