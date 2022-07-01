@@ -77,3 +77,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+***Third Party Notice***
+Use of source code or binaries contained within Braze’s SDKs is permitted only to enable use of the Braze platform by customers of Braze.
+[Braze License Agreement](https://github.com/braze-inc/braze-swift-sdk/blob/main/Sources/BrazeKitResources/Resources/braze.license)
