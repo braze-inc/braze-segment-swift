@@ -80,6 +80,6 @@ SOFTWARE.
 
 ***Third Party Notice***
 
-Use of source code or binaries contained within Braze’s SDKs is permitted only to enable use of the Braze platform by customers of Braze. You must follow the terms of the below license found in the braze-swif-sdk.
+Use of source code or binaries contained within Braze’s SDKs is permitted only to enable use of the Braze platform by customers of Braze. You must follow the terms of the below license found in the braze-swift-sdk.
 
 [Braze License Agreement](https://github.com/braze-inc/braze-swift-sdk/blob/main/Sources/BrazeKitResources/Resources/braze.license)
