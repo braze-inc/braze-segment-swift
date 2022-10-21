@@ -63,7 +63,7 @@ public class BrazeDestination: DestinationPlugin {
             apiKey: brazeSettings?.apiKey ?? "",
             endpoint: brazeSettings?.customEndpoint ?? ""
             )
-        configuration.api.addSDKMetadata([.segment])
+        configuration.api.sdkMetadata.insert(Braze.Configuration.Api.SdkMetadata.segment)  //.addSDKMetadata([.segment])
 
         braze = Braze(configuration: configuration)
     }
