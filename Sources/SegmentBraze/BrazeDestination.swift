@@ -59,11 +59,11 @@ public class BrazeDestination: DestinationPlugin {
         guard let tempSettings: BrazeSettings = settings.integrationSettings(forPlugin: self) else { return }
         brazeSettings = tempSettings
         
-        let configuration = Braze.Configuration(
+        var configuration = Braze.Configuration(
             apiKey: brazeSettings?.apiKey ?? "",
             endpoint: brazeSettings?.customEndpoint ?? ""
             )
-        configuration.api.addSDKMetadata([.segment])
+        configuration.api.addSdkMetadata([Braze.Configuration.Api.SdkMetadata.segment])
 
         braze = Braze(configuration: configuration)
     }
