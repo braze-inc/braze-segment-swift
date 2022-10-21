@@ -32,5 +32,5 @@ jobs:
     - name: build for ios simulator
       run: |
           cd Example/BasicExample
-          xcodebuild -workspace "BasicExample.xcworkspace" -scheme "BasicExample" -sdk iphonesimulator
-          
+          xcodebuild -project "BasicExample.xcodeproj" -scheme "BasicExample" -sdk iphonesimulator
+
