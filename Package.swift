@@ -26,7 +26,7 @@ let package = Package(
             from: "1.1.2"
         ),
         .package(
-            name: "Braze_Swift_SDK",
+            name: "braze-swift-sdk",
             url:"https://github.com/braze-inc/braze-swift-sdk.git",
             from: "5.0.0"),
     ],
@@ -35,7 +35,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "SegmentBraze",
-            dependencies: ["Segment", .product(name: "BrazeKit", package: "Braze_Swift_SDK")]),
+            dependencies: ["Segment", .product(name: "BrazeKit", package: "braze-swift-sdk")]),
         
         // TESTS ARE HANDLED VIA THE EXAMPLE APP.
     ]
