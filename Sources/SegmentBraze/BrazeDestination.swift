@@ -64,11 +64,11 @@ public class BrazeDestination: DestinationPlugin {
         guard let tempSettings: BrazeSettings = settings.integrationSettings(forPlugin: self) else { return }
         brazeSettings = tempSettings
         
-        var configuration = Braze.Configuration(
+        let configuration = Braze.Configuration(
             apiKey: brazeSettings?.apiKey ?? "",
             endpoint: brazeSettings?.customEndpoint ?? ""
             )
-        configuration.api.addSdkMetadata([Braze.Configuration.Api.SdkMetadata.segment])
+        configuration.api.addSDKMetadata([Braze.Configuration.Api.SDKMetadata.segment])
 
         braze = Braze(configuration: configuration)
     }
@@ -237,7 +237,6 @@ private struct BrazeSettings: Codable {
     let minimumIntervalBetweenTriggerActionsInSeconds: Double?
     let allowCrawlerActivity: Bool?
     let enableHtmlInAppMessages: Bool?
-//    let versionSettings: Dictionary<String, Any?> // not Codable
     let bundlingStatus: String?
     let serviceWorkerLocation: String?
     let requireExplicitInAppMessageDismissal: Bool?
@@ -270,22 +269,4 @@ extension BrazeDestination {
         return "USD"
     }
     
-}
-    
-// Rules for converting keys and values to the proper formats that bridge
-// from Segment to the Partner SDK. These are only examples.
-private extension BrazeDestination {
-    
-    static var eventNameMap = ["ADD_TO_CART": "Product Added",
-                               "PRODUCT_TAPPED": "Product Tapped"]
-    
-    static var eventValueConversion: ((_ key: String, _ value: Any) -> Any) = { (key, value) in
-        if let valueString = value as? String {
-            return valueString
-                .replacingOccurrences(of: "-", with: "_")
-                .replacingOccurrences(of: " ", with: "_")
-        } else {
-            return value
-        }
-    }
 }
