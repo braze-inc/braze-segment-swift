@@ -39,6 +39,11 @@ import UIKit
  An implementation of the Braze Analytics device mode destination as a plugin.
  */
 
+@objc(SEGBrazeDestination)
+public class ObjCSegmentBraze: NSObject, ObjCDestination, ObjCDestinationShim {
+    public func instance() -> DestinationPlugin { return BrazeDestination() }
+}
+
 public class BrazeDestination: DestinationPlugin {
     public let timeline = Timeline()
     public let type = PluginType.destination
