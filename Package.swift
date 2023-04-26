@@ -23,12 +23,12 @@ let package = Package(
         .package(
             name: "Segment",
             url: "https://github.com/segmentio/analytics-swift.git",
-            from: "1.1.2"
+            from: "1.4.1"
         ),
         .package(
             name: "braze-swift-sdk",
             url:"https://github.com/braze-inc/braze-swift-sdk.git",
-            from: "5.0.0"),
+            from: "5.8.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

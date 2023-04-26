@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Segment",
+        "repositoryURL": "https://github.com/segmentio/analytics-swift.git",
+        "state": {
+          "branch": null,
+          "revision": "79fb17a5d4abf8f80e6a0935e57c7df7b670a6c0",
+          "version": "1.4.1"
+        }
+      },
+      {
+        "package": "braze-swift-sdk",
+        "repositoryURL": "https://github.com/braze-inc/braze-swift-sdk.git",
+        "state": {
+          "branch": null,
+          "revision": "3f322b0ca1ec2f53bc87192a39377be7e8f142db",
+          "version": "5.8.1"
+        }
+      },
+      {
+        "package": "SDWebImage",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImage.git",
+        "state": {
+          "branch": null,
+          "revision": "fb50c1d20f24db5322b2f8f379de3618f75fe08e",
+          "version": "5.15.5"
+        }
+      },
+      {
+        "package": "Sovran",
+        "repositoryURL": "https://github.com/segmentio/Sovran-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "944c17d7c46bd95fc37f09136cabd172be5b413b",
+          "version": "1.0.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

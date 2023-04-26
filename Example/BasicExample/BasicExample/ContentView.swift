@@ -13,12 +13,13 @@ struct ContentView: View {
         VStack {
             HStack {
                 Button(action: {
-                    var traits = [String:Any]()
+                    var traits = [String:Codable]()
                     var products = [Any]()
                     products.append(["price":1,"quantity":1,"productId":"foo","color":"blue", "dupe":"override"])
                     products.append(["price":2,"quantity":2,"productId":"bar","size":"large"])
                     products.append(["price":3,"quantity":3,"productId":"baz","fit":9])
-                    traits["products"] = products
+                    let productStr = convertIntoJSONString(arrayObject: products)
+                    traits["products"] = productStr
                     traits["dupe"] = "default"
                     traits["general"] = "value"
                     Analytics.main.track(name: "Order Completed", properties: traits)
@@ -39,7 +40,7 @@ struct ContentView: View {
                     Text("Group")
                 }).padding(6)
                 Button(action: {
-                    var traits = [String:Any]()
+                    var traits = [String:Codable]()
                     traits["birthday"] = "1980-06-07T01:21:13Z"
                     traits["email"] = "testuser@test.com"
                     traits["firstName"] = "fnu"
@@ -61,6 +62,20 @@ struct ContentView: View {
             print("Executed Analytics onDisappear()")
         }
     }
+    
+    func convertIntoJSONString(arrayObject: [Any]) -> String? {
+
+            do {
+                let jsonData: Data = try JSONSerialization.data(withJSONObject: arrayObject, options: [])
+                if  let jsonString = NSString(data: jsonData, encoding: String.Encoding.utf8.rawValue) {
+                    return jsonString as String
+                }
+                
+            } catch let error as NSError {
+                print("Array convertIntoJSON - \(error.description)")
+            }
+            return nil
+        }
 }
 
 struct ContentView_Previews: PreviewProvider {
