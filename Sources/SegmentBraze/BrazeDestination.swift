@@ -1,286 +1,435 @@
-//
-//  BrazeDestination.swift
-//  BrazeDestination
-//
-//  Created by Michael Grosse Huelsewiesche on 5/17/22.
-//
-
-// NOTE: You can see this plugin in use in the BasicExample application.
-//
-
-// MIT License
-//
-// Copyright (c) 2022 Segment
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+import BrazeKit
 import Foundation
 import Segment
-import BrazeKit
-import UIKit
 
-/**
- An implementation of the Braze Analytics device mode destination as a plugin.
- */
+#if canImport(BrazeUI)
+  import BrazeUI
+#endif
 
-public class BrazeDestination: DestinationPlugin {
-    public let timeline = Timeline()
-    public let type = PluginType.destination
-    public let key = "Appboy"
-    public var analytics: Analytics? = nil
-    var braze: Braze? = nil
-    
-    private var brazeSettings: BrazeSettings?
-        
-    public init() { }
-    
-    public func update(settings: Settings, type: UpdateType) {
-        // Skip if you have a singleton and don't want to keep updating via settings.
-        guard type == .initial else { return }
-        
-        // Grab the settings and assign them for potential later usage.
-        // Note: Since integrationSettings is generic, strongly type the variable.
-        guard let tempSettings: BrazeSettings = settings.integrationSettings(forPlugin: self) else { return }
-        brazeSettings = tempSettings
-        
-        var configuration = Braze.Configuration(
-            apiKey: brazeSettings?.apiKey ?? "",
-            endpoint: brazeSettings?.customEndpoint ?? ""
-            )
-        configuration.api.addSdkMetadata([Braze.Configuration.Api.SdkMetadata.segment])
+// MARK: - BrazeDestination
 
-        braze = Braze(configuration: configuration)
+/// The Braze destination plugin for the Segment SDK.
+///
+/// The Braze destination can be used like any other Segment destination and will inherit the
+/// settings from the Segment dashboard:
+/// ```
+/// analytics.add(plugin: BrazeDestination())
+/// ```
+///
+/// To customize the Braze SDK further, you can use the `additionalConfiguration` closure:
+/// ```
+/// let brazeDestination = BrazeDestination(
+///   additionalConfiguration: { configuration in
+///     // Enable debug / verbose logs
+///     configuration.logger.level = .debug
+///
+///     // Enable push support (disabling automatic push authorization prompt)
+///     configuration.push.automation = true
+///     configuration.push.automation.requestAuthorizationAtLaunch = false
+///   }
+/// )
+/// analytics.add(plugin: BrazeDestination())
+/// ```
+///
+/// An `additionalSetup` closure is also available to customize the Braze SDK further after it has
+/// been initialized:
+/// ```
+/// let brazeDestination = BrazeDestination(
+///   additionalSetup: { braze in
+///     // Save the Braze instance on the AppDelegate for later use.
+///     AppDelegate.braze = braze
+///   }
+/// )
+/// analytics.add(plugin: BrazeDestination())
+/// ```
+///
+/// See the Braze Swift SDK [documentation][1] for more information.
+///
+/// [1]: https://braze-inc.github.io/braze-swift-sdk
+public class BrazeDestination: DestinationPlugin, VersionedPlugin {
+
+  // MARK: - Properties
+
+  // - DestinationPlugin
+
+  public let timeline = Timeline()
+  public let type = PluginType.destination
+  public let key = "Appboy"
+  public weak var analytics: Analytics? = nil
+
+  // - Braze
+
+  /// The Braze instance.
+  public internal(set) var braze: Braze? = nil
+
+  #if canImport(BrazeUI)
+    /// The Braze in-app message UI, available when `automaticInAppMessageRegistrationEnabled` is
+    /// set to `true` on the Segment dashboard.
+    public internal(set) var inAppMessageUI: BrazeInAppMessageUI? = nil
+  #endif
+
+  private let additionalConfiguration: ((Braze.Configuration) -> Void)?
+  private let additionalSetup: ((Braze) -> Void)?
+
+  // - Braze / Segment bridge
+
+  private var logPurchaseWhenRevenuePresent: Bool = true
+
+  // MARK: - Initialization
+
+  /// Creates and returns a Braze destination plugin for the Segment SDK.
+  ///
+  /// See ``BrazeDestination`` for more information.
+  ///
+  /// - Parameters:
+  ///   - additionalConfiguration: When provided, this closure is called with the Braze
+  ///       configuration object before the SDK initialization. You can use this to set additional
+  ///       Braze configuration options (e.g. session timeout, push notification automation, etc.).
+  ///   - additionalSetup: When provided, this closure is called with the fully initialized Braze
+  ///       instance. You can use this to customize further your usage of the Braze SDK (e.g.
+  ///       register UI delegates, messaging subscriptions, etc.)
+  public init(
+    additionalConfiguration: ((Braze.Configuration) -> Void)? = nil,
+    additionalSetup: ((Braze) -> Void)? = nil
+  ) {
+    self.additionalConfiguration = additionalConfiguration
+    self.additionalSetup = additionalSetup
+  }
+
+  // MARK: - Plugin
+
+  public func update(settings: Settings, type: UpdateType) {
+    guard
+      type == .initial,
+      let brazeSettings: BrazeSettings = settings.integrationSettings(forPlugin: self),
+      let configuration = makeBrazeConfiguration(from: brazeSettings)
+    else {
+      log(
+        message:
+          """
+          Invalid settings, BrazeDestination will not be initialized:
+          - settings: \(settings.prettyPrint())
+          """
+      )
+      return
     }
-    
-    public func identify(event: IdentifyEvent) -> IdentifyEvent? {
-        
-        if let userId = event.userId, !userId.isEmpty {
-            braze?.changeUser(userId: userId)
-        }
+    self.log(message: "Braze Destination is enabled")
+    braze = makeBraze(from: brazeSettings, configuration: configuration)
+    logPurchaseWhenRevenuePresent = brazeSettings.logPurchaseWhenRevenuePresent ?? true
+  }
 
-        if let traits = event.traits?.dictionaryValue {
-            if let birthday = traits["birthday"] as? String {
-                let dateformatter = DateFormatter()
-                dateformatter.locale = Locale(identifier: "en_US_POSIX")
-                dateformatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ" // RFC3339 format date
-                let formattedBirthday = dateformatter.date(from: birthday)
-                braze?.user.set(dateOfBirth: formattedBirthday)
-            }
-            
-            if let email = traits["email"] as? String {
-                braze?.user.set(email: email)
-            }
-
-            if let firstName = traits["firstName"] as? String {
-                braze?.user.set(firstName: firstName)
-            }
-
-            if let lastName = traits["lastName"] as? String {
-                braze?.user.set(lastName: lastName)
-            }
-            
-            if let gender = traits["gender"] as? String {
-                if gender.lowercased() == "m" || gender.lowercased() == "male" {
-                    braze?.user.set(gender: Braze.User.Gender.male)
-                }
-                else if gender.lowercased() == "f" || gender.lowercased() == "female" {
-                    braze?.user.set(gender: Braze.User.Gender.female)
-                }
-                else if gender.lowercased() == "na" || gender.lowercased() == "not applicable" {
-                    braze?.user.set(gender: Braze.User.Gender.notApplicable)
-                }
-                else if gender.lowercased() == "other" {
-                    braze?.user.set(gender: Braze.User.Gender.other)
-                }
-                else if gender.lowercased() == "prefer not to say" {
-                    braze?.user.set(gender: Braze.User.Gender.preferNotToSay)
-                }
-                else {
-                    braze?.user.set(gender: Braze.User.Gender.unknown)
-                }
-            }
-            
-            if let phone = traits["phone"] as? String {
-                braze?.user.set(phoneNumber: phone)
-            }
-            
-            if let address = traits["address"] as? Dictionary<String, Any> {
-                if let city = address["city"] as? String {
-                    braze?.user.set(homeCity: city)
-                }
-                if let country = address["country"] as? String {
-                    braze?.user.set(country: country)
-                }
-            }
-            
-            let brazeTraits = ["birthday", "email", "firstName", "lastName", "gender", "phone", "address", "anonymousID"]
-            
-            for trait in traits where !brazeTraits.contains(trait.key) {
-                switch trait.value {
-                case let val as String:
-                    braze?.user.setCustomAttribute(key: trait.key, value: val)
-                case let val as Date:
-                    braze?.user.setCustomAttribute(key: trait.key, value: val)
-                case let val as Bool:
-                    braze?.user.setCustomAttribute(key: trait.key, value: val)
-                case let val as Int:
-                    braze?.user.setCustomAttribute(key: trait.key, value: val)
-                case let val as Double:
-                    braze?.user.setCustomAttribute(key: trait.key, value: val)
-                case let val as Array<String>:
-                    braze?.user.setCustomAttributeArray(key: trait.key, array: val)
-                default:
-                    braze?.user.setCustomAttribute(key: trait.key, value: String(describing: trait.value))
-                }
-            }
-        }
-
-        return event
+  public func execute<T>(event: T?) -> T? where T: RawEvent {
+    // Intercept ATT / IDFA events to forward them to Braze
+    if let context = event?.context?.dictionaryValue {
+      if let adTrackingEnabled = context[keyPath: "device.adTrackingEnabled"] as? Bool {
+        braze?.set(adTrackingEnabled: adTrackingEnabled)
+      }
+      if let idfa = context[keyPath: "device.advertisingId"] as? String {
+        braze?.set(identifierForAdvertiser: idfa)
+      }
     }
-    
-    public func track(event: TrackEvent) -> TrackEvent? {
-        let properties = event.properties?.dictionaryValue
-        let revenue = self.extractRevenue(key: "revenue", from: properties)
-        if (revenue != nil && revenue != 0) || event.event == "Order Completed" || event.event == "Completed Order" {
-            let currency = properties?["currency"] as? String ?? "USD"
-            
-            if properties != nil {
-                var appboyProperties = properties!
-                appboyProperties["currency"] = nil
-                appboyProperties["revenue"] = nil
-                if let products = appboyProperties["products"] as? Array<Any> {
-                    appboyProperties["products"] = nil
-                    for product in products {
-                        var productDict = product as? Dictionary<String, Any>
-                        let productId = productDict?["productId"] as? String ?? "Unknown"
-                        let productRevenue = self.extractRevenue(key: "price", from: productDict)
-                        let productQuantity = productDict?["quantity"] as? Int
-                        productDict?["productId"] = nil
-                        productDict?["price"] = nil
-                        productDict?["quantity"] = nil
-                        var productProperties = appboyProperties
-                        if let productDict = productDict {
-                            productProperties.merge(productDict, uniquingKeysWith: { (_, new) in new } )
-                        }
-                        braze?.logPurchase(productId: productId,
-                                           currency: currency,
-                                           price: productRevenue ?? 0,
-                                           quantity: productQuantity ?? 0,
-                                           properties: productProperties)
-                    }
-                } else {
-                    braze?.logPurchase(productId: event.event,
-                                       currency: currency,
-                                       price: revenue ?? 0,
-                                       quantity: 1,
-                                       properties: appboyProperties)
-                }
-            } else {
-                braze?.logPurchase(productId: event.event,
-                                   currency: currency,
-                                   price: revenue ?? 0,
-                                   quantity: 1)
-            }
-        }
-        return event
+
+    // Default implementation (Segment/Timeline.swift)
+    var result: T? = event
+    switch result {
+        case let r as IdentifyEvent:
+            result = self.identify(event: r) as? T
+        case let r as TrackEvent:
+            result = self.track(event: r) as? T
+        case let r as ScreenEvent:
+            result = self.screen(event: r) as? T
+        case let r as AliasEvent:
+            result = self.alias(event: r) as? T
+        case let r as GroupEvent:
+            result = self.group(event: r) as? T
+        default:
+            break
     }
+    return result
+  }
+
+  // MARK: - EventPlugin
+
+  public func identify(event: IdentifyEvent) -> IdentifyEvent? {
+
+    guard let braze else { return event }
+
+    if let userId = event.userId, !userId.isEmpty {
+      braze.changeUser(userId: userId)
+    }
+
+    guard let traits = event.traits?.dictionaryValue else { return event }
+
+    // Defined / known user attributes
+    if let birthday = traits["birthday"] as? String {
+      let dateformatter = DateFormatter()
+      dateformatter.locale = Locale(identifier: "en_US_POSIX")
+      dateformatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"  // RFC3339 format date
+      let formattedBirthday = dateformatter.date(from: birthday)
+      braze.user.set(dateOfBirth: formattedBirthday)
+    }
+
+    if let email = traits["email"] as? String {
+      braze.user.set(email: email)
+    }
+
+    if let firstName = traits["firstName"] as? String {
+      braze.user.set(firstName: firstName)
+    }
+
+    if let lastName = traits["lastName"] as? String {
+      braze.user.set(lastName: lastName)
+    }
+
+    if let gender = (traits["gender"] as? String)?.lowercased() {
+      if Keys.maleTokens.contains(gender) {
+        braze.user.set(gender: .male)
+      } else if Keys.femaleTokens.contains(gender) {
+        braze.user.set(gender: .female)
+      } else if Keys.notApplicableTokens.contains(gender) {
+        braze.user.set(gender: .notApplicable)
+      } else if gender.lowercased() == "other" {
+        braze.user.set(gender: .other)
+      } else if gender.lowercased() == "prefer not to say" {
+        braze.user.set(gender: .preferNotToSay)
+      } else {
+        braze.user.set(gender: .unknown)
+      }
+    }
+
+    if let phone = traits["phone"] as? String {
+      braze.user.set(phoneNumber: phone)
+    }
+
+    if let address = traits["address"] as? [String: Any] {
+      if let city = address["city"] as? String {
+        braze.user.set(homeCity: city)
+      }
+      if let country = address["country"] as? String {
+        braze.user.set(country: country)
+      }
+    }
+
+    // Subscription groups
+    if let subscriptions = traits[Keys.subscriptionGroup.rawValue] as? [[String: Any]] {
+      for subscription in subscriptions {
+        guard
+          let groupID = subscription[Keys.subscriptionId.rawValue] as? String,
+          let groupState = subscription[Keys.subscriptionState.rawValue] as? String
+        else { continue }
+        switch groupState {
+        case "subscribed":
+          braze.user.addToSubscriptionGroup(id: groupID)
+        case "unsubscribed":
+          braze.user.removeFromSubscriptionGroup(id: groupID)
+        default:
+          log(message: "Unsupported subscription state '\(groupState)' for group '\(groupID)'")
+        }
+      }
+    }
+
+    // Custom user attributes
+    for trait in traits where !Keys.reservedKeys.contains(trait.key) {
+      let key = trait.key
+      switch trait.value {
+      case let value as String:
+        braze.user.setCustomAttribute(key: key, value: value)
+      case let value as Date:
+        braze.user.setCustomAttribute(key: key, value: value)
+      case let value as Bool:
+        braze.user.setCustomAttribute(key: key, value: value)
+      case let value as Int:
+        braze.user.setCustomAttribute(key: key, value: value)
+      case let value as Double:
+        braze.user.setCustomAttribute(key: key, value: value)
+      case let value as [String]:
+        braze.user.setCustomAttribute(key: key, array: value)
+      default:
+        braze.user.setCustomAttribute(key: key, value: String(describing: trait.value))
+      }
+    }
+
+    return event
+  }
+
+  public func track(event: TrackEvent) -> TrackEvent? {
+    let properties = event.properties
+    let revenue = extractRevenue(key: "revenue", from: properties?.dictionaryValue)
+    let treatAsPurchase = revenue != nil && logPurchaseWhenRevenuePresent
+
+    switch event.event {
+    case Keys.installEventName.rawValue:
+      setAttributionData(properties: properties)
+    case Keys.purchaseEventName1.rawValue where treatAsPurchase,
+      Keys.purchaseEventName2.rawValue where treatAsPurchase:
+      logPurchase(name: event.event, properties: event.properties?.dictionaryValue ?? [:])
+    default:
+      logCustomEvent(name: event.event, properties: event.properties?.dictionaryValue)
+    }
+
+    return event
+  }
+
+  public func reset() {
+    self.log(message: "Wiping data and resetting Braze.")
+    braze?.wipeData()
+    braze?.enabled = true
+  }
+
+  public func flush() {
+    self.log(message: "Calling braze.requestImmediateDataFlush().")
+    braze?.requestImmediateDataFlush()
+  }
+
+  // MARK: - VersionedPlugin
+
+  public static func version() -> String { _version }
+
+  // MARK: - Private Methods
+
+  private func makeBrazeConfiguration(from settings: BrazeSettings) -> Braze.Configuration? {
+    guard let endpoint = settings.customEndpoint else { return nil }
+    let configuration = Braze.Configuration(apiKey: settings.apiKey, endpoint: endpoint)
+    configuration.api.addSDKMetadata([.segment])
+    configuration.api.sdkFlavor = .segment
+    return configuration
+  }
+
+  private func makeBraze(
+    from settings: BrazeSettings,
+    configuration: Braze.Configuration
+  ) -> Braze {
+    additionalConfiguration?(configuration)
+
+    let braze = Braze(configuration: configuration)
+
+    #if canImport(BrazeUI)
+      if settings.automaticInAppMessageRegistrationEnabled == true {
+        inAppMessageUI = BrazeInAppMessageUI()
+        braze.inAppMessagePresenter = inAppMessageUI
+      }
+    #endif
+
+    additionalSetup?(braze)
+
+    return braze
+  }
+
+  private func setAttributionData(properties: JSON?) {
+    let attributionData = Braze.User.AttributionData(
+      network: properties?.value(forKeyPath: "campaign.source"),
+      campaign: properties?.value(forKeyPath: "campaign.name"),
+      adGroup: properties?.value(forKeyPath: "campaign.ad_group"),
+      creative: properties?.value(forKeyPath: "campaign.as_creative")
+    )
+    braze?.user.set(attributionData: attributionData)
+  }
+
+  private func logPurchase(name: String, properties: [String: Any]) {
+    let currency: String = properties["currency"] as? String ?? "USD"
+
+    // - Multiple products in a single event.
+    if let products = properties["products"] as? [[String: Any]] {
+      for var product in products {
+        // - Retrieve fields
+        let productId = product["productId"] as? String ?? "Unknown"
+        let price = extractRevenue(key: "price", from: product) ?? 0
+        let quantity = product["quantity"] as? Int
+        // - Cleanup
+        product["productId"] = nil
+        product["price"] = nil
+        product["quantity"] = nil
+        // - Merge with root properties
+        let productProperties = properties.merging(product) { _, new in new }
+        // - Log
+        braze?.logPurchase(
+          productId: productId,
+          currency: currency,
+          price: price,
+          quantity: quantity ?? 0,
+          properties: productProperties
+        )
+      }
+      return
+    }
+
+    // - Regular purchase event.
+    let price = extractRevenue(key: "revenue", from: properties) ?? 0
+    braze?.logPurchase(
+      productId: name,
+      currency: currency,
+      price: price,
+      properties: properties
+    )
+  }
+
+  private func logCustomEvent(name: String, properties: [String: Any]?) {
+    var properties = properties
+    properties?["revenue"] = nil
+    properties?["currency"] = nil
+    braze?.logCustomEvent(name: name, properties: properties)
+  }
+
+  private func extractRevenue(key: String, from properties: [String: Any]?) -> Double? {
+    if let revenueDouble = properties?[key] as? Double {
+      return revenueDouble
+    }
+
+    if let revenueString = properties?[key] as? String {
+      let revenueDouble = Double(revenueString)
+      return revenueDouble
+    }
+
+    return nil
+  }
+
+  private func log(message: String) {
+    analytics?.log(message: "[BrazeSegment] \(message)")
+  }
+
+  // MARK: - Keys
+
+  private enum Keys: String {
+    case installEventName = "Install Attributed"
+    case purchaseEventName1 = "Order Completed"
+    case purchaseEventName2 = "Completed Order"
+
+    case subscriptionGroup = "braze_subscription_groups"
+    case subscriptionId = "subscription_group_id"
+    case subscriptionState = "subscription_state_id"
+
+    static let maleTokens: Set<String> = ["m", "male"]
+    static let femaleTokens: Set<String> = ["f", "female"]
+    static let notApplicableTokens: Set<String> = ["na", "not applicable"]
+
+    static let reservedKeys: Set<String> = [
+      "birthday",
+      "email",
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "address",
+      "anonymousId",
+      "userId",
+      Keys.subscriptionGroup.rawValue,
+    ]
+  }
+
 }
 
-extension BrazeDestination: VersionedPlugin {
-    public static func version() -> String {
-        return __destination_version
-    }
-}
+// MARK: - Settings
 
 private struct BrazeSettings: Codable {
-    let sessionTimeoutInSeconds: Double?
-    let doNotLoadFontAwesome: Bool?
-    let safariWebsitePushId: String?
-    let enableLogging: Bool?
-    let restCustomEndpoint: String?
-    let version: String?
-    let type: String?
-    let onlyTrackKnownUsersOnWeb: Bool?
-    let openInAppMessagesInNewTab: Bool?
-    let trackAllPages: Bool?
-    let trackNamedPages: Bool?
-    let apiKey: String
-    let customEndpoint: String?
-    let logPurchaseWhenRevenuePresent: Bool?
-    let automaticallyDisplayMessages: Bool?
-    let updateExistingOnly: Bool?
-    let automatic_in_app_message_registration_enabled: Bool?
-    let localization: String?
-    let openNewsFeedCardsInNewTab: Bool?
-    let datacenter: String
-    let minimumIntervalBetweenTriggerActionsInSeconds: Double?
-    let allowCrawlerActivity: Bool?
-    let enableHtmlInAppMessages: Bool?
-//    let versionSettings: Dictionary<String, Any?> // not Codable
-    let bundlingStatus: String?
-    let serviceWorkerLocation: String?
-    let requireExplicitInAppMessageDismissal: Bool?
+  let apiKey: String
+  let customEndpoint: String?
+  let automaticInAppMessageRegistrationEnabled: Bool?
+  let logPurchaseWhenRevenuePresent: Bool?
 
-    
-}
-
-extension BrazeDestination {
-    internal func extractRevenue(key: String, from properties: [String: Any]?) -> Double? {
-        
-        if let revenueDouble =  properties?[key] as? Double {
-            return revenueDouble
-        }
-        
-        if let revenueString = properties?[key] as? String  {
-            let revenueDouble = Double(revenueString)
-            return revenueDouble
-        }
-        
-        return nil
-    }
-    
-    
-    internal func extractCurrency(key: String, from properties: [String: Any]?, withDefault value: String? = nil) -> String? {
-        
-        if let currency = properties?[key] as? String {
-            return currency
-        }
-        
-        return "USD"
-    }
-    
-}
-    
-// Rules for converting keys and values to the proper formats that bridge
-// from Segment to the Partner SDK. These are only examples.
-private extension BrazeDestination {
-    
-    static var eventNameMap = ["ADD_TO_CART": "Product Added",
-                               "PRODUCT_TAPPED": "Product Tapped"]
-    
-    static var eventValueConversion: ((_ key: String, _ value: Any) -> Any) = { (key, value) in
-        if let valueString = value as? String {
-            return valueString
-                .replacingOccurrences(of: "-", with: "_")
-                .replacingOccurrences(of: " ", with: "_")
-        } else {
-            return value
-        }
-    }
+  enum CodingKeys: String, CodingKey {
+    case apiKey
+    case customEndpoint
+    case automaticInAppMessageRegistrationEnabled = "automatic_in_app_message_registration_enabled"
+    case logPurchaseWhenRevenuePresent
+  }
 }

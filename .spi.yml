@@ -1,0 +1,9 @@
+version: 1
+builder:
+  configs:
+    - platform: ios
+      documentation_targets: [SegmentBraze]
+    - platform: ios
+      scheme: SegmentBrazeUI
+    - platform: tvos
+      scheme: SegmentBraze
