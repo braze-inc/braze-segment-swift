@@ -55,8 +55,13 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   public let timeline = Timeline()
   public let type = PluginType.destination
   public let key = "Appboy"
-  public weak var analytics: Analytics? = nil
+  public weak var analytics: Analytics? = nil {
+    didSet {
+      idfaPlugin.analytics = analytics
+    }
+  }
 
+  private var idfaPlugin = BrazeIDFAPlugin()
   // - Braze
 
   /// The Braze instance.
@@ -116,36 +121,6 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     self.log(message: "Braze Destination is enabled")
     braze = makeBraze(from: brazeSettings, configuration: configuration)
     logPurchaseWhenRevenuePresent = brazeSettings.logPurchaseWhenRevenuePresent ?? true
-  }
-
-  public func execute<T>(event: T?) -> T? where T: RawEvent {
-    // Intercept ATT / IDFA events to forward them to Braze
-    if let context = event?.context?.dictionaryValue {
-      if let adTrackingEnabled = context[keyPath: "device.adTrackingEnabled"] as? Bool {
-        braze?.set(adTrackingEnabled: adTrackingEnabled)
-      }
-      if let idfa = context[keyPath: "device.advertisingId"] as? String {
-        braze?.set(identifierForAdvertiser: idfa)
-      }
-    }
-
-    // Default implementation (Segment/Timeline.swift)
-    var result: T? = event
-    switch result {
-        case let r as IdentifyEvent:
-            result = self.identify(event: r) as? T
-        case let r as TrackEvent:
-            result = self.track(event: r) as? T
-        case let r as ScreenEvent:
-            result = self.screen(event: r) as? T
-        case let r as AliasEvent:
-            result = self.alias(event: r) as? T
-        case let r as GroupEvent:
-            result = self.group(event: r) as? T
-        default:
-            break
-    }
-    return result
   }
 
   // MARK: - EventPlugin
@@ -311,6 +286,9 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     #endif
 
     additionalSetup?(braze)
+
+    idfaPlugin.braze = braze
+    add(plugin: idfaPlugin)
 
     return braze
   }
