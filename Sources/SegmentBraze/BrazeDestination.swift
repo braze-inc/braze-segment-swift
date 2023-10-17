@@ -215,7 +215,8 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
       for subscription in subscriptions {
         guard
           let groupID = subscription[Keys.subscriptionId.rawValue] as? String,
-          let groupState = subscription[Keys.subscriptionState.rawValue] as? String
+          let groupState = subscription[Keys.subscriptionGroupState.rawValue] as? String
+            ?? subscription[Keys.subscriptionStateId.rawValue] as? String
         else { continue }
         switch groupState {
         case "subscribed":
@@ -244,6 +245,13 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
         braze.user.setCustomAttribute(key: key, value: value)
       case let value as [String]:
         braze.user.setCustomAttribute(key: key, array: value)
+      case let value as [String: Any?]:
+        braze.user.setCustomAttribute(key: key, dictionary: formatDictionary(value))
+      case let value as [[String: Any?]]:
+        let formattedArray = value.map { formatDictionary($0) }
+        braze.user.setCustomAttribute(key: key, array: formattedArray)
+      case let value as [Any?]:
+        braze.user.setCustomAttribute(key: key, array: castToStringArray(value))
       default:
         braze.user.setCustomAttribute(key: key, value: String(describing: trait.value))
       }
@@ -386,6 +394,58 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   private func log(message: String) {
     analytics?.log(message: "[BrazeSegment] \(message)")
   }
+  
+  /// Prepares the object dictionary to be sent upstream to Braze.
+  private func formatDictionary(_ jsonObject: [String: Any?]) -> [String: Any?] {
+    jsonObject.mapValues { object in
+      switch object {
+      case let stringArray as [String]:
+        return stringArray
+      case let jsonArray as [Any?]:
+        return formatArray(jsonArray)
+      case let dictionary as [String: Any?]:
+        return formatDictionary(dictionary)
+      default:
+        return object
+      }
+    }
+  }
+  
+  /// Formats the array to convert any non-string values to strings.
+  private func formatArray(_ jsonArray: [Any?]) -> [Any] {
+    jsonArray.compactMap { object in
+      guard let object else {
+        self.log(message: "Failed to format JSON array element: \(String(describing: object))")
+        return nil
+      }
+      switch object {
+      // Short-circuit arrays already containing strings to avoid re-converting them.
+      case let stringArray as [String]:
+        return stringArray
+      case let dictionary as [String: Any?]:
+        return formatDictionary(dictionary)
+      case let nestedArray as [Any?]:
+        return formatArray(nestedArray)
+      default:
+        return "\(object)"
+      }
+    }
+  }
+  
+  /// Fallback to casting the entire array to strings if it doesn't match a Braze-accepted format.
+  private func castToStringArray(_ jsonArray: [Any?]) -> [String] {
+    jsonArray.compactMap { object in
+      guard let object else {
+        self.log(message: "Failed to stringify JSON array element: \(String(describing: object))")
+        return nil
+      }
+      if let string = object as? String {
+        return string
+      } else {
+        return "\(object)"
+      }
+    }
+  }
 
   // MARK: - Keys
 
@@ -396,7 +456,8 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
     case subscriptionGroup = "braze_subscription_groups"
     case subscriptionId = "subscription_group_id"
-    case subscriptionState = "subscription_state_id"
+    case subscriptionStateId = "subscription_state_id"
+    case subscriptionGroupState = "subscription_group_state"
 
     static let maleTokens: Set<String> = ["m", "male"]
     static let femaleTokens: Set<String> = ["f", "female"]

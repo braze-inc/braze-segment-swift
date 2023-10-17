@@ -58,6 +58,72 @@ struct ContentView: View {
           traits["phone"] = "1-234-5678"
           traits["address"] = ["city": "Paris", "country": "USA"]
           traits["foo"] = ["bar": "baz"]
+          traits["braze_subscription_groups"] = [
+            [
+              "subscription_group_id": "1234",
+              "subscription_group_state": "subscribed"
+            ],
+            [
+              "subscription_group_id": "2234",
+              "subscription_group_state": "unsubscribed"
+            ]
+          ]
+          traits["any_array"] = [
+            10,
+            false,
+            "string_item"
+          ]
+          traits["nested_object"] = [
+            "prop_1": "default",
+            "prop_2": true,
+            "prop_3": 1.0,
+            "nested_array": [
+              "string",
+              1.8,
+              true
+            ],
+            "string_array": [
+              "string1",
+              "string2",
+              "string3"
+            ],
+            "double_nested_object": [
+              "very_nested1": "nest",
+              "very_nested2": 2.5,
+              "very_nested_array": [
+                1,
+                2,
+                3
+              ]
+            ]
+          ]
+          traits["nested_object_array"] = [
+            [
+              "array_obj1": true,
+              "array_obj2": "name"
+            ],
+            [
+              "array_obj3": 1.5,
+              "array_array": [
+                2.3,
+                "string",
+                false,
+                [
+                  28,
+                  27,
+                  false
+                ],
+                [
+                  "object1": "name",
+                  "object2": 2.1,
+                  "nested_array": [
+                    25.2,
+                    26.1
+                  ]
+                ]
+              ]
+            ]
+          ]
           Analytics.main.identify(userId: "X-1234567890", traits: traits)
         }
       }
