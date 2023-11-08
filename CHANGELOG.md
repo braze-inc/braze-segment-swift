@@ -1,3 +1,12 @@
+## 2.1.0
+
+#### Added
+- Adds the key `subscription_group_state` for setting the subscribed/unsubscribed status when using `braze_subscription_groups` in the Identify call.
+  - Use this value instead of `subscription_state_id`.
+- Adds support for nested custom attributes.
+  - If the object sent through Segment's `Identify` call has values that are of type `[String: Any?]`, those values will be sent to Braze as a nested custom attribute.
+  - If the object sent through Segment's `Identify` call contains an array, the values of that array will be converted to strings, and the array will be reported to Braze as an array of strings.
+
 ## 2.0.0
 
 #### Added
