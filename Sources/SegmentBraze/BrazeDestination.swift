@@ -1,6 +1,7 @@
 import BrazeKit
 import Foundation
 import Segment
+import os
 
 #if canImport(BrazeUI)
   import BrazeUI
@@ -102,6 +103,8 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     self.additionalSetup = additionalSetup
   }
 
+    let logger = Logger(subsystem: "com.your_company.your_subsystem",
+              category: "your_category_name")
   // MARK: - Plugin
 
   public func update(settings: Settings, type: UpdateType) {
@@ -287,14 +290,24 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
     let braze = Braze(configuration: configuration)
 
-      self.log(message: "check if can import BrazeUI")
-    #if canImport(BrazeUI)
-      if settings.automaticInAppMessageRegistrationEnabled == true {
-          self.log(message: "can import braze UI - setting in app message delegate")
-        inAppMessageUI = BrazeInAppMessageUI()
-        braze.inAppMessagePresenter = inAppMessageUI
+      if #available(iOS 14.0, *) {
+          logger.info("Check if can if can import BrazeUI")
+      } else {
+          // Fallback on earlier versions
       }
-    #endif
+
+      if #available(iOS 14.0, *) {
+#if canImport(BrazeUI)
+          if settings.automaticInAppMessageRegistrationEnabled == true {
+              logger.info("Can import braze ui - set in app message presenter")
+
+              inAppMessageUI = BrazeInAppMessageUI()
+              braze.inAppMessagePresenter = inAppMessageUI
+          }
+#endif
+      } else {
+          // Fallback on earlier versions
+      }
 
     additionalSetup?(braze)
 
