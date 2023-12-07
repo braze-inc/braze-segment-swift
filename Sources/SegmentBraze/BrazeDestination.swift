@@ -67,6 +67,7 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   /// The Braze instance.
   public internal(set) var braze: Braze? = nil
 
+
   #if canImport(BrazeUI)
     /// The Braze in-app message UI, available when `automaticInAppMessageRegistrationEnabled` is
     /// set to `true` on the Segment dashboard.
@@ -286,8 +287,10 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
     let braze = Braze(configuration: configuration)
 
+      self.log(message: "check if can import BrazeUI")
     #if canImport(BrazeUI)
       if settings.automaticInAppMessageRegistrationEnabled == true {
+          self.log(message: "can import braze UI - setting in app message delegate")
         inAppMessageUI = BrazeInAppMessageUI()
         braze.inAppMessagePresenter = inAppMessageUI
       }
