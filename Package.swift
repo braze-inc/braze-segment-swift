@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
   name: "braze-segment-swift",
   platforms: [
-    .iOS("13.0"),
+    .iOS("14.0"),
     .tvOS("11.0"),
   ],
   products: [

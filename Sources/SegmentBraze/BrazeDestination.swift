@@ -47,6 +47,7 @@ import os
 /// See the Braze Swift SDK [documentation][1] for more information.
 ///
 /// [1]: https://braze-inc.github.io/braze-swift-sdk
+@available(iOS 14.0, *)
 public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
   // MARK: - Properties
@@ -103,8 +104,6 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     self.additionalSetup = additionalSetup
   }
 
-    let logger = Logger(subsystem: "com.your_company.your_subsystem",
-              category: "your_category_name")
   // MARK: - Plugin
 
   public func update(settings: Settings, type: UpdateType) {
@@ -290,24 +289,25 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
     let braze = Braze(configuration: configuration)
 
-      if #available(iOS 14.0, *) {
-          logger.info("Check if can if can import BrazeUI")
-      } else {
-          // Fallback on earlier versions
-      }
+
 
       if #available(iOS 14.0, *) {
-#if canImport(BrazeUI)
+          print("[] create logger")
+          let logger = Logger(subsystem: "com.braze.segment",
+                              category: "com.braze.segment")
+
+          logger.info("Check if can if can import BrazeUI")
+
+        #if canImport(BrazeUI)
           if settings.automaticInAppMessageRegistrationEnabled == true {
               logger.info("Can import braze ui - set in app message presenter")
 
               inAppMessageUI = BrazeInAppMessageUI()
               braze.inAppMessagePresenter = inAppMessageUI
           }
-#endif
-      } else {
-          // Fallback on earlier versions
+    #endif
       }
+
 
     additionalSetup?(braze)
 
