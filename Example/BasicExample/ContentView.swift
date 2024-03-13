@@ -2,53 +2,27 @@ import Segment
 import SwiftUI
 
 struct ContentView: View {
+  @State private var userId: String = ""
+
   var body: some View {
     List {
-      Section("Segment Actions") {
-        Button("Track Purchase") {
-          var traits = [String: Any]()
-          var products = [Any]()
-          products.append([
-            "price": 1,
-            "quantity": 1,
-            "productId": "foo",
-            "color": "blue",
-            "dupe": "override",
-          ] as [String : Any])
-          products.append([
-            "price": 2,
-            "quantity": 2,
-            "productId": "bar",
-            "size": "large"
-          ] as [String : Any])
-          products.append([
-            "price": 3,
-            "quantity": 3,
-            "productId": "baz",
-            "fit": 9
-          ] as [String : Any])
-          traits["products"] = products
-          traits["dupe"] = "default"
-          traits["general"] = "value"
-          traits["revenue"] = 14.0
-          Analytics.main.track(name: "Order Completed", properties: traits)
+      Section("Identify Action") {
+        TextField("Enter user id", text: $userId)
+          .autocapitalization(.none)
+          .disableAutocorrection(true)
+
+        Button("Identify without traits") {
+          guard userId != "" else {
+            print("Provide a User id to call the `Identify` action.")
+            return
+          }
+          Analytics.main.identify(userId: userId)
         }
-        Button("Track Custom Event") {
-          let properties: [String: Any] = [
-            "foo": "baz",
-            "count": 15,
-            "correct": false
-          ]
-          Analytics.main.track(name: "braze-custom-event", properties: properties)
-        }
-        Button("Screen") {
-          Analytics.main.screen(title: "Screen appeared")
-        }
-        Button("Group") {
-          Analytics.main.group(groupId: "12345-Group")
-          Analytics.main.log(message: "Started group")
-        }
-        Button("Identify") {
+        Button("Identify with traits") {
+          guard userId != "" else {
+            print("Provide a User id to call the `Identify` action.")
+            return
+          }
           var traits = [String: Any]()
           traits["birthday"] = "1980-06-07T01:21:13Z"
           traits["email"] = "testuser@test.com"
@@ -124,7 +98,53 @@ struct ContentView: View {
               ]
             ]
           ]
-          Analytics.main.identify(userId: "X-1234567890", traits: traits)
+          Analytics.main.identify(userId: userId, traits: traits)
+        }
+      }
+
+      Section("Other Segment Actions") {
+        Button("Track Purchase") {
+          var traits = [String: Any]()
+          var products = [Any]()
+          products.append([
+            "price": 1,
+            "quantity": 1,
+            "productId": "foo",
+            "color": "blue",
+            "dupe": "override",
+          ] as [String : Any])
+          products.append([
+            "price": 2,
+            "quantity": 2,
+            "productId": "bar",
+            "size": "large"
+          ] as [String : Any])
+          products.append([
+            "price": 3,
+            "quantity": 3,
+            "productId": "baz",
+            "fit": 9
+          ] as [String : Any])
+          traits["products"] = products
+          traits["dupe"] = "default"
+          traits["general"] = "value"
+          traits["revenue"] = 14.0
+          Analytics.main.track(name: "Order Completed", properties: traits)
+        }
+        Button("Track Custom Event") {
+          let properties: [String: Any] = [
+            "foo": "baz",
+            "count": 15,
+            "correct": false
+          ]
+          Analytics.main.track(name: "braze-custom-event", properties: properties)
+        }
+        Button("Screen") {
+          Analytics.main.screen(title: "Screen appeared")
+        }
+        Button("Group") {
+          Analytics.main.group(groupId: "12345-Group")
+          Analytics.main.log(message: "Started group")
         }
       }
     }
