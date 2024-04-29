@@ -1,3 +1,9 @@
+## 2.4.0
+
+#### Added
+- Updates the Braze Swift SDK bindings to include releases from the `9.X.X` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `6.6.0` up to, but not including, `10.0.0`.
+
 ## 2.3.0
 
 #### Added

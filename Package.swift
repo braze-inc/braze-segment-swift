@@ -6,7 +6,7 @@ let package = Package(
   name: "braze-segment-swift",
   platforms: [
     .iOS("13.0"),
-    .tvOS("11.0"),
+    .tvOS("12.0"),
   ],
   products: [
     .library(
@@ -25,7 +25,7 @@ let package = Package(
     ),
     .package(
       url:"https://github.com/braze-inc/braze-swift-sdk",
-      "6.6.0"..<"9.0.0"
+      "6.6.0"..<"10.0.0"
     ),
   ],
   targets: [
