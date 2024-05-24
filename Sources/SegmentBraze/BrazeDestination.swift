@@ -266,6 +266,26 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
 
   public static func version() -> String { _version }
 
+  // MARK: - Delayed Initialization
+
+  /// Setup the Braze SDK to support delayed initialization.
+  ///
+  /// Delayed initialization is useful when all the required data to initialize the SDK is not
+  /// available at the application launch (e.g. API key retrieved asynchronously from a remote
+  /// server) or after agreeing to terms of service.
+  ///
+  /// Calling this method will ensure that Braze push notifications received before the SDK is
+  /// initialized are properly processed during its initialization. When making use of delayed
+  /// initialization, the SDK will implicitly enable its push notification automation feature.
+  /// See ``BrazeKit/Braze/Configuration-swift.class/Push-swift.class/automation-swift.property``
+  /// for more details.
+  ///
+  /// - Important: This method must be called as soon as possible in the application lifecycle,
+  ///              ideally in or before `application(_:didFinishLaunchingWithOptions:)`.
+  public static func prepareForDelayedInitialization() {
+    Braze._prepareForDelayedInitialization()
+  }
+
   // MARK: - Private Methods
 
   private func makeBrazeConfiguration(from settings: BrazeSettings) -> Braze.Configuration? {

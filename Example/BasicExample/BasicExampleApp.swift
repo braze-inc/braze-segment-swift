@@ -6,6 +6,8 @@ let segmentWriteKey = "6986CcMHxN4rXpYe3ieKBTtXQHryZVRi"
 
 @main
 struct BasicExampleApp: App {
+  @UIApplicationDelegateAdaptor var appDelegate: AppDelegate
+
   var body: some Scene {
     WindowGroup {
       ContentView()
@@ -48,4 +50,22 @@ extension Analytics {
       }
     )
   }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+  ) -> Bool {
+
+    // Segment plugins are initialized asynchronously. We call
+    // `BrazeDestination.prepareForDelayedInitialization()` as early as possible in the app
+    // lifecycle to ensure that Braze can handle push notifications received before the SDK is
+    // initialized by Segment.
+    BrazeDestination.prepareForDelayedInitialization()
+
+    return true
+  }
+  
 }

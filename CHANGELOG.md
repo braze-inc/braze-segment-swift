@@ -1,3 +1,15 @@
+## 3.0.0
+
+#### Breaking
+- Updates the Braze Swift SDK bindings to require releases from the `9.2.0+` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `9.2.0` up to, but not including, `10.0.0`.
+  - Refer to the changelog entries for [`7.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#700), [`8.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#800), and [`9.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#900) for more information on potential breaking changes.
+- Push notification support now requires a call to the static method `BrazeDestination.prepareForDelayedInitialization()` as early as possible in the app lifecycle, in your application's `AppDelegate.application(_:didFinishLaunchingWithOptions:)` method.
+
+#### Fixed
+- Restore push notification support when the BrazeDestination plugin is integrated with Analytics-Swift `1.5.0+`.
+  - See the _Breaking_ entry of the changelog for more information.
+
 ## 2.4.0
 
 #### Added

@@ -87,6 +87,8 @@ BrazeDestination(
 
 To enable push notifications support, refer to the [_Push Notifications_](https://www.braze.com/docs/developer_guide/platform_integration_guides/swift/push_notifications/) documentation. To keep the integration minimal, the Braze SDK provides push automation features (see sample code above and the [`automation`](https://braze-inc.github.io/braze-swift-sdk/documentation/brazekit/braze/configuration-swift.class/push-swift.class/automation-swift.property) documentation).
 
+> ⚠️ Important: Starting with _analytics-swift_ 1.5.0, destination plugins are initialized asynchronously. In order for the Braze SDK to correctly handle push notifications, you must call the [`BrazeDestination.prepareForDelayedInitialization()`](https://braze-inc.github.io/braze-swift-sdk/documentation/brazekit/braze/preparefordelayedinitialization(pushautomation:)) method as early as possible in your app's lifecycle, in your application's `AppDelegate.application(_:didFinishLaunchingWithOptions:)` method.
+
 ### IDFA Collection
 
 When making use of the [`IDFACollection`](https://github.com/segmentio/analytics-swift/blob/main/Examples/other_plugins/IDFACollection.swift) Segment plugin, the `BrazeDestination` will automatically forward the collected IDFA to Braze.
