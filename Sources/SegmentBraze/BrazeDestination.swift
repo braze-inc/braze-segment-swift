@@ -283,7 +283,7 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   /// - Important: This method must be called as soon as possible in the application lifecycle,
   ///              ideally in or before `application(_:didFinishLaunchingWithOptions:)`.
   public static func prepareForDelayedInitialization() {
-    Braze._prepareForDelayedInitialization()
+    Braze.prepareForDelayedInitialization()
   }
 
   // MARK: - Private Methods

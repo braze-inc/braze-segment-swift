@@ -1,3 +1,10 @@
+## 4.0.0
+
+#### Breaking
+- Updates the Braze Swift SDK bindings to require releases from the `10.2.0+` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `10.2.0` up to, but not including, `11.0.0`.
+  - Refer to the changelog entry for [`10.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1000) for more information on potential breaking changes.
+
 ## 3.0.0
 
 #### Breaking
