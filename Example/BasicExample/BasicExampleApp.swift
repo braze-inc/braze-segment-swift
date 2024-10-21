@@ -16,6 +16,8 @@ struct BasicExampleApp: App {
 }
 
 extension Analytics {
+  
+  @MainActor
   static var main: Analytics = {
     let analytics = Analytics(
       configuration: Configuration(writeKey: segmentWriteKey)

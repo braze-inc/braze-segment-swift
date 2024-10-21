@@ -12,7 +12,8 @@
 		46EDC6FA27C6B8D200B870D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46EDC6F927C6B8D200B870D7 /* Assets.xcassets */; };
 		46EDC6FD27C6B8D200B870D7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46EDC6FC27C6B8D200B870D7 /* Preview Assets.xcassets */; };
 		46EDC72127C6B92C00B870D7 /* Segment in Frameworks */ = {isa = PBXBuildFile; productRef = 46EDC72027C6B92C00B870D7 /* Segment */; };
-		662990A72A760B8E003DE911 /* SegmentBraze in Frameworks */ = {isa = PBXBuildFile; productRef = 662990A62A760B8E003DE911 /* SegmentBraze */; };
+		70D4F5DE2CC2576F0071AB53 /* SegmentBrazeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 70D4F5DD2CC2576F0071AB53 /* SegmentBrazeUI */; };
+		70D4F5E02CC257BD0071AB53 /* SegmentBraze in Frameworks */ = {isa = PBXBuildFile; productRef = 70D4F5DF2CC257BD0071AB53 /* SegmentBraze */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,8 +32,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70D4F5E02CC257BD0071AB53 /* SegmentBraze in Frameworks */,
 				46EDC72127C6B92C00B870D7 /* Segment in Frameworks */,
-				662990A72A760B8E003DE911 /* SegmentBraze in Frameworks */,
+				70D4F5DE2CC2576F0071AB53 /* SegmentBrazeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,7 +113,8 @@
 			name = BasicExample;
 			packageProductDependencies = (
 				46EDC72027C6B92C00B870D7 /* Segment */,
-				662990A62A760B8E003DE911 /* SegmentBraze */,
+				70D4F5DD2CC2576F0071AB53 /* SegmentBrazeUI */,
+				70D4F5DF2CC257BD0071AB53 /* SegmentBraze */,
 			);
 			productName = BasicExample;
 			productReference = 46EDC6F227C6B8D100B870D7 /* BasicExample.app */;
@@ -320,6 +323,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.segment.BasicExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -351,6 +355,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.segment.BasicExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -396,7 +401,11 @@
 			package = 46EDC71F27C6B92C00B870D7 /* XCRemoteSwiftPackageReference "analytics-swift" */;
 			productName = Segment;
 		};
-		662990A62A760B8E003DE911 /* SegmentBraze */ = {
+		70D4F5DD2CC2576F0071AB53 /* SegmentBrazeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SegmentBrazeUI;
+		};
+		70D4F5DF2CC257BD0071AB53 /* SegmentBraze */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SegmentBraze;
 		};

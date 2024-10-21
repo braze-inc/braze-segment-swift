@@ -65,11 +65,12 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   #if canImport(BrazeUI)
     /// The Braze in-app message UI, available when `automaticInAppMessageRegistrationEnabled` is
     /// set to `true` on the Segment dashboard.
+    @MainActor
     public internal(set) var inAppMessageUI: BrazeInAppMessageUI? = nil
   #endif
 
   private let additionalConfiguration: ((Braze.Configuration) -> Void)?
-  private let additionalSetup: ((Braze) -> Void)?
+  private let additionalSetup: (@MainActor (Braze) -> Void)?
 
   /// The IDFA plugin. This is a no-op if no IDFA is provided.
   private var idfaPlugin = BrazeIDFAPlugin()
@@ -93,7 +94,7 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   ///       register UI delegates, messaging subscriptions, etc.)
   public init(
     additionalConfiguration: ((Braze.Configuration) -> Void)? = nil,
-    additionalSetup: ((Braze) -> Void)? = nil
+    additionalSetup: (@MainActor (Braze) -> Void)? = nil
   ) {
     self.additionalConfiguration = additionalConfiguration
     self.additionalSetup = additionalSetup
@@ -305,13 +306,17 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     let braze = Braze(configuration: configuration)
 
     #if canImport(BrazeUI)
-      if settings.automaticInAppMessageRegistrationEnabled == true {
+    if settings.automaticInAppMessageRegistrationEnabled == true {
+      MainActor.synchronousRun {
         inAppMessageUI = BrazeInAppMessageUI()
         braze.inAppMessagePresenter = inAppMessageUI
       }
+    }
     #endif
 
-    additionalSetup?(braze)
+    MainActor.synchronousRun {
+      additionalSetup?(braze)
+    }
 
     // This is a no-op if no IDFA configuration is provided.
     idfaPlugin.braze = braze

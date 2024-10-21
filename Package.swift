@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -25,7 +25,7 @@ let package = Package(
     ),
     .package(
      url:"https://github.com/braze-inc/braze-swift-sdk",
-     "10.2.0"..<"11.0.0"
+     "11.1.1"..<"12.0.0"
     ),
   ],
   targets: [
