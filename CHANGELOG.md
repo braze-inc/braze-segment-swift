@@ -1,3 +1,10 @@
+## 5.0.1
+
+#### Fixed
+- Fixes the internal `logPurchase` method call to check for product IDs using the key `"product_id"` instead of `"productId"`.
+  - This change is backwards compatible, but in the event that both keys are provided, `"product_id"` will take precedence over `"productId"`.
+  - This aligns the Braze Segment plugin with the [V2 Ecommerce Events Spec](https://segment.com/docs/connections/spec/ecommerce/v2/).
+
 ## 5.0.0
 
 #### Breaking

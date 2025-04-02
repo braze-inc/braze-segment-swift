@@ -343,10 +343,14 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
     if let products = properties["products"] as? [[String: Any]] {
       for var product in products {
         // - Retrieve fields
-        let productId = product["productId"] as? String ?? "Unknown"
+        // This SDK previously checked for `"productId"` but will now accept `"product_id"` as the first default, according to the Segment V2 spec.
+        let productId = product["product_id"] as? String
+                          ?? product["productId"] as? String
+                          ?? "Unknown"
         let price = extractRevenue(key: "price", from: product) ?? 0
         let quantity = product["quantity"] as? Int
         // - Cleanup
+        product["product_id"] = nil
         product["productId"] = nil
         product["price"] = nil
         product["quantity"] = nil

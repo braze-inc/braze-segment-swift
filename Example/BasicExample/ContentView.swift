@@ -109,7 +109,7 @@ struct ContentView: View {
           products.append([
             "price": 1,
             "quantity": 1,
-            "productId": "foo",
+            "product_id": "foo",
             "color": "blue",
             "dupe": "override",
           ] as [String : Any])
@@ -122,7 +122,8 @@ struct ContentView: View {
           products.append([
             "price": 3,
             "quantity": 3,
-            "productId": "baz",
+            "product_id": "baz",
+            "productId": "foo",
             "fit": 9
           ] as [String : Any])
           traits["products"] = products
