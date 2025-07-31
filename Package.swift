@@ -24,8 +24,8 @@ let package = Package(
       from: "1.1.2"
     ),
     .package(
-     url:"https://github.com/braze-inc/braze-swift-sdk",
-     "12.0.0"..<"13.0.0"
+      url: "https://github.com/braze-inc/braze-swift-sdk-xcode-26-preview",
+      "12.0.0"..<"13.0.0"
     ),
   ],
   targets: [
@@ -33,15 +33,15 @@ let package = Package(
       name: "SegmentBraze",
       dependencies: [
         .product(name: "Segment", package: "analytics-swift"),
-        .product(name: "BrazeKit", package: "braze-swift-sdk"),
+        .product(name: "BrazeKit", package: "braze-swift-sdk-xcode-26-preview"),
       ]
     ),
     .target(
       name: "SegmentBrazeUI",
       dependencies: [
         .product(name: "Segment", package: "analytics-swift"),
-        .product(name: "BrazeKit", package: "braze-swift-sdk"),
-        .product(name: "BrazeUI", package: "braze-swift-sdk"),
+        .product(name: "BrazeKit", package: "braze-swift-sdk-xcode-26-preview"),
+        .product(name: "BrazeUI", package: "braze-swift-sdk-xcode-26-preview"),
       ]
     ),
   ]

@@ -10,12 +10,12 @@
       }
     },
     {
-      "identity" : "braze-swift-sdk",
+      "identity" : "braze-swift-sdk-xcode-26-preview",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/braze-inc/braze-swift-sdk",
+      "location" : "https://github.com/braze-inc/braze-swift-sdk-xcode-26-preview",
       "state" : {
-        "revision" : "c55c56908d4b44d43495bd9bd394c3011e2e3acb",
-        "version" : "12.0.0"
+        "revision" : "96413af7819bd8a0037d2050be8dacd7ce0104ce",
+        "version" : "12.1.0"
       }
     },
     {
