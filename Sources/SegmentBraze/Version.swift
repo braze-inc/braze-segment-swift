@@ -1,3 +1,3 @@
 extension BrazeDestination {
-  public static let _version = "6.0.0"
+  public static let _version = "7.0.0"
 }

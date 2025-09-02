@@ -25,7 +25,7 @@ let package = Package(
     ),
     .package(
      url:"https://github.com/braze-inc/braze-swift-sdk",
-     "12.0.0"..<"13.0.0"
+     "13.0.0"..<"14.0.0"
     ),
   ],
   targets: [
@@ -44,5 +44,15 @@ let package = Package(
         .product(name: "BrazeUI", package: "braze-swift-sdk"),
       ]
     ),
+    .testTarget(
+      name: "SegmentBrazeTests",
+      dependencies: [
+        "SegmentBraze",
+        .product(name: "Segment", package: "analytics-swift"),
+        .product(name: "BrazeKit", package: "braze-swift-sdk"),
+        .product(name: "BrazeUI", package: "braze-swift-sdk"),
+      ],
+      path: "UnitTests"
+    )
   ]
 )
