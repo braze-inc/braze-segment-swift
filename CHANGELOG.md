@@ -1,3 +1,15 @@
+## 8.0.0
+
+#### Breaking
+- Updates the Braze Swift SDK bindings to require releases from the `14.0.0+` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `14.0.0` up to, but not including, `15.0.0`.
+  - Refer to the changelog entry for [`14.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1400) for more information on potential breaking changes.
+  
+#### Added
+- Adds support for SDK Authentication.
+  - To enable SDK Authentication in your app, add `configuration.api.sdkAuthentication = true` to the `additionalConfiguration` in the `BrazeDestination` initializer.
+  - In order to set the SDK authentication signature, include the key "braze_sdk_auth_signature" in the `identify` call.
+
 ## 7.0.0
 
 #### Breaking
