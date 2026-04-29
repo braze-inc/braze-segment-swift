@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/braze-inc/braze-swift-sdk",
       "state" : {
-        "revision" : "e51deeb2f83ccb3d556b809449427b32b1b14c4a",
-        "version" : "13.1.0"
+        "revision" : "e31907eaa0dbd151dc2e6826de66cc494242ba60",
+        "version" : "14.0.1"
       }
     },
     {

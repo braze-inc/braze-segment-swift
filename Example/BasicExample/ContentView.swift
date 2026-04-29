@@ -7,7 +7,7 @@ struct ContentView: View {
   var body: some View {
     List {
       Section("Identify Action") {
-        TextField("Enter user id", text: $userId)
+        TextField("User ID", text: $userId)
           .autocapitalization(.none)
           .disableAutocorrection(true)
 
@@ -102,6 +102,37 @@ struct ContentView: View {
         }
       }
 
+      Section("SDK authentication") {
+        Text("Uses the User ID field in Identify Action. If it is empty, the current Segment user is used when available.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+
+        Button("Identify — sample traits + SDK auth") {
+          let signature = Self.randomSdkAuthSignature()
+          let traits = Self.buildSampleIdentifyTraits(
+            includeSdkAuthSignature: true,
+            sdkAuthSignature: signature
+          )
+          let typedId = userId.trimmingCharacters(in: .whitespacesAndNewlines)
+          if !typedId.isEmpty {
+            Analytics.main.identify(userId: typedId, traits: traits)
+            print("Identify (SDK auth) userId=\(typedId) braze_sdk_auth_signature=\(signature)")
+          } else if let current = Analytics.main.userId, !current.isEmpty {
+            Analytics.main.identify(userId: current, traits: traits)
+            print("Identify (SDK auth) userId=\(current) (from Segment) braze_sdk_auth_signature=\(signature)")
+          } else {
+            print(
+              "Identify (SDK auth): enter a User ID in Identify Action, or identify once so a current user exists."
+            )
+          }
+        }
+
+        Button("Update SDK auth signature only") {
+          let signature = Self.randomSdkAuthSignature()
+          Analytics.main.identify(traits: ["braze_sdk_auth_signature": signature])
+        }
+      }
+
       Section("Other Segment Actions") {
         Button("Track Purchase") {
           var traits = [String: Any]()
@@ -157,6 +188,34 @@ struct ContentView: View {
       Analytics.main.track(name: "onDisappear")
       print("Executed Analytics onDisappear()")
     }
+  }
+
+  private static func randomSdkAuthSignature() -> String {
+    String(Int.random(in: 0..<100))
+  }
+
+  private static func buildSampleIdentifyTraits(
+    includeSdkAuthSignature: Bool,
+    sdkAuthSignature: String = ""
+  ) -> [String: Any] {
+    var traits = [String: Any]()
+    if includeSdkAuthSignature, !sdkAuthSignature.isEmpty {
+      traits["braze_sdk_auth_signature"] = sdkAuthSignature
+    }
+    traits["username"] = "BobBraze"
+    traits["email"] = "bob@test.com"
+    traits["plan"] = "premium"
+    traits["testArray"] = ["test", 3, true] as [Any]
+    let skillInfo: [String: Any] = [
+      "certified": true,
+      "languages": ["Swift", "Java", 1, false] as [Any],
+    ]
+    traits["jobInfo"] = [
+      "department": "G9D",
+      "office": "030-2 E208",
+      "skillInfo": skillInfo,
+    ] as [String: Any]
+    return traits
   }
 }
 

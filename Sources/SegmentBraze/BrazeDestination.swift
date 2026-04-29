@@ -26,6 +26,9 @@ import Segment
 ///     // Enable push support (disabling automatic push authorization prompt)
 ///     configuration.push.automation = true
 ///     configuration.push.automation.requestAuthorizationAtLaunch = false
+///
+///     // Enable SDK authentication
+///     configuration.api.sdkAuthentication = true
 ///   }
 /// )
 /// analytics.add(plugin: BrazeDestination())
@@ -243,6 +246,7 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   ///
   /// ### Special Traits
   /// - `braze_subscription_groups`: Array of subscription group configurations
+  /// - `braze_sdk_auth_signature`: JWT for SDK Authentication
   ///
   /// ### Custom Attributes
   /// All other traits are set as custom attributes in Braze with automatic type conversion.
@@ -265,13 +269,25 @@ public class BrazeDestination: DestinationPlugin, VersionedPlugin {
   public func identify(event: IdentifyEvent) -> IdentifyEvent? {
     guard let braze else { return event }
 
-    if let userId = event.userId, !userId.isEmpty {
-      braze.changeUser(userId: userId)
+    let segmentUserId = event.userId
+    let traits = event.traits?.dictionaryValue ?? [:]
+    let authSignature = traits[Keys.sdkAuthenticationSignature.rawValue] as? String
+
+    // Check if user ID was provided.
+    if let userId = segmentUserId, !userId.isEmpty {
+      if let auth = authSignature, !auth.isEmpty {
+        braze.changeUser(userId: userId, sdkAuthSignature: auth)
+      } else {
+        braze.changeUser(userId: userId)
+      }
+    } else if let auth = authSignature, !auth.isEmpty {
+      // Auth signature was provided without user ID.
+      braze.set(sdkAuthenticationSignature: auth)
     }
 
-    guard let traits = event.traits?.dictionaryValue else { return event }
-    processUserTraits(traits)
-
+    if !traits.isEmpty {
+      processUserTraits(traits)
+    }
     return event
   }
 
@@ -790,6 +806,8 @@ extension BrazeDestination {
     case subscriptionId = "subscription_group_id"
     case subscriptionStateId = "subscription_state_id"
     case subscriptionGroupState = "subscription_group_state"
+      
+    case sdkAuthenticationSignature = "braze_sdk_auth_signature"
 
     static let maleTokens: Set<String> = ["m", "male"]
     static let femaleTokens: Set<String> = ["f", "female"]
@@ -805,6 +823,7 @@ extension BrazeDestination {
       "address",
       "anonymousId",
       "userId",
+      Keys.sdkAuthenticationSignature.rawValue,
       Keys.subscriptionGroup.rawValue,
     ]
   }
