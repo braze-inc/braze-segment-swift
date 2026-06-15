@@ -1,87 +1,95 @@
+## 9.0.0
+
+###### Breaking
+- Updates the Braze Swift SDK bindings to require releases from the `15.0.0+` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `15.0.0` up to, but not including, `16.0.0`.
+  - Raises the Xcode version to 26.0 (17A324).
+  - Refer to the changelog entry for [`15.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1500) for more information on potential breaking changes.
+
 ## 8.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `14.0.0+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `14.0.0` up to, but not including, `15.0.0`.
   - Refer to the changelog entry for [`14.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1400) for more information on potential breaking changes.
-  
-#### Added
+
+##### Added
 - Adds support for SDK Authentication.
   - To enable SDK Authentication in your app, add `configuration.api.sdkAuthentication = true` to the `additionalConfiguration` in the `BrazeDestination` initializer.
   - In order to set the SDK authentication signature, include the key "braze_sdk_auth_signature" in the `identify` call.
 
 ## 7.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `13.0.0+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `13.0.0` up to, but not including, `14.0.0`.
   - Refer to the changelog entry for [`13.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1300) for more information on potential breaking changes.
 
 ## 6.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `12.0.0+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `12.0.0` up to, but not including, `13.0.0`.
   - Refer to the changelog entry for [`12.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1200) for more information on potential breaking changes.
 
 ## 5.0.1
 
-#### Fixed
+##### Fixed
 - Fixes the internal `logPurchase` method call to check for product IDs using the key `"product_id"` instead of `"productId"`.
   - This change is backwards compatible, but in the event that both keys are provided, `"product_id"` will take precedence over `"productId"`.
   - This aligns the Braze Segment plugin with the [V2 Ecommerce Events Spec](https://segment.com/docs/connections/spec/ecommerce/v2/).
 
 ## 5.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `11.1.1+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `11.1.1` up to, but not including, `12.0.0`.
   - Refer to the changelog entry for [`11.1.1`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1111) for more information on potential breaking changes.
 
 ## 4.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `10.2.0+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `10.2.0` up to, but not including, `11.0.0`.
   - Refer to the changelog entry for [`10.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1000) for more information on potential breaking changes.
 
 ## 3.0.0
 
-#### Breaking
+##### Breaking
 - Updates the Braze Swift SDK bindings to require releases from the `9.2.0+` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `9.2.0` up to, but not including, `10.0.0`.
   - Refer to the changelog entries for [`7.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#700), [`8.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#800), and [`9.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#900) for more information on potential breaking changes.
 - Push notification support now requires a call to the static method `BrazeDestination.prepareForDelayedInitialization()` as early as possible in the app lifecycle, in your application's `AppDelegate.application(_:didFinishLaunchingWithOptions:)` method.
 
-#### Fixed
+##### Fixed
 - Restore push notification support when the BrazeDestination plugin is integrated with Analytics-Swift `1.5.0+`.
   - See the _Breaking_ entry of the changelog for more information.
 
 ## 2.4.0
 
-#### Added
+##### Added
 - Updates the Braze Swift SDK bindings to include releases from the `9.X.X` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `6.6.0` up to, but not including, `10.0.0`.
 
 ## 2.3.0
 
-#### Added
+##### Added
 - Updates the Braze Swift SDK bindings to include releases from the `8.X.X` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `6.6.0` up to, but not including, `9.0.0`.
 
-#### Fixed
+##### Fixed
 - Fixes an issue introduced in `2.0.0` where the `execute` method was not being triggered in Segment middleware plugins.
 
 ## 2.2.0
 
-#### Added
+##### Added
 - Updates the Braze Swift SDK bindings to include releases from the `7.X.X` SemVer denomination.
   - This allows compatibility with any version of the Braze SDK from `6.6.0` up to, but not including, `8.0.0`.
   - This is not a breaking change unless you choose to update to `7.0.0` and up. For further details, refer to the `7.0.0` [release notes](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#700).
 
 ## 2.1.0
 
-#### Added
+##### Added
 - Adds the key `subscription_group_state` for setting the subscribed/unsubscribed status when using `braze_subscription_groups` in the Identify call.
   - Use this value instead of `subscription_state_id`.
 - Adds support for nested custom attributes.
@@ -90,7 +98,7 @@
 
 ## 2.0.0
 
-#### Added
+##### Added
 - Renames this repository from `analytics-swift-braze` to `braze-segment-swift`.
   - This repository is now located at https://github.com/braze-inc/braze-segment-swift.
 - Adds the `SegmentBrazeUI` module, which provides the `BrazeDestination` plugin with `BrazeUI` support.
