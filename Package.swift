@@ -25,7 +25,7 @@ let package = Package(
     ),
     .package(
       url: "https://github.com/braze-inc/braze-swift-sdk",
-      "15.0.0"..<"16.0.0"
+      "18.0.0"..<"19.0.0"
     ),
   ],
   targets: [

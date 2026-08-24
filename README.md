@@ -95,4 +95,4 @@ When making use of the [`IDFACollection`](https://github.com/segmentio/analytics
 
 ## Questions?
 
-If you have questions, please contact [support@braze.com](mailto:support@braze.com) or open a [GitHub Issue](https://github.com/braze-inc/braze-segment-swift/issues).
+If you have questions, please contact Braze Technical Support for assistance or open a [GitHub Issue](https://github.com/braze-inc/braze-segment-swift/issues).
