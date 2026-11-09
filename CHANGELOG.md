@@ -1,3 +1,11 @@
+## 11.0.0
+
+##### Breaking
+- Updates the Braze Swift SDK bindings to require releases from the `19.0.0+` SemVer denomination.
+  - This allows compatibility with any version of the Braze SDK from `19.0.0` up to, but not including, `20.0.0`.
+  - Raises the minimum deployment targets to iOS 15.0 and tvOS 15.0, matching Braze Swift SDK 19.0.0.
+  - Refer to the changelog entry for [`19.0.0`](https://github.com/braze-inc/braze-swift-sdk/blob/main/CHANGELOG.md#1900) for more information on potential breaking changes.
+
 ## 10.0.0
 
 ##### Breaking
